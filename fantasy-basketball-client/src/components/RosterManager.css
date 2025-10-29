@@ -1,0 +1,59 @@
+.roster-manager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.roster-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 500px;
+}
+
+.roster-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+  text-align: center;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.player-list {
+  min-height: 400px;
+  transition: background-color 0.2s;
+}
+
+.player-list.dragging-over {
+  background-color: #e3f2fd;
+  border: 2px dashed #2196f3;
+  border-radius: 8px;
+}
+
+.dragging {
+  opacity: 0.5;
+}
+
+.empty-roster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #999;
+  font-size: 1.1rem;
+  font-style: italic;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .roster-manager {
+    grid-template-columns: 1fr;
+  }
+}
