@@ -1,0 +1,107 @@
+.recommendations {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.recommendations h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.recommendations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.recommendation-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #ddd;
+}
+
+.recommendation-card.start {
+  border-left-color: #28a745;
+}
+
+.recommendation-card.sit {
+  border-left-color: #dc3545;
+}
+
+.rec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.rec-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.rec-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.rec-badge.start {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.rec-badge.sit {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.confidence-bar {
+  position: relative;
+  height: 24px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(to right, #28a745, #ffc107, #dc3545);
+  transition: width 0.3s ease;
+}
+
+.confidence-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  text-shadow: 0 0 2px white;
+}
+
+.reasons {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.reason-item {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .recommendations-list {
+    grid-template-columns: 1fr;
+  }
+}
