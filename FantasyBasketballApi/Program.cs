@@ -1,4 +1,6 @@
 using FantasyBasketballApi.Services;
+using FantasyBasketballApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+// Add DbContext
+builder.Services.AddDbContext<FantasyBasketballContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register application services
 builder.Services.AddSingleton<IPlayerService, PlayerService>();
