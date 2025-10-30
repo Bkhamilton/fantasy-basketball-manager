@@ -67,6 +67,7 @@ Located in `/fantasy-basketball-client`
 - [.NET 9.0 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 18+](https://nodejs.org/)
 - npm (comes with Node.js)
+- [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-downloads) (Express or LocalDB recommended for development)
 
 ### Installation
 
@@ -83,7 +84,20 @@ Located in `/fantasy-basketball-client`
    dotnet build
    ```
 
-3. **Setup Frontend**
+3. **Setup Database** (Optional - currently using in-memory data)
+   
+   The project includes SQL Server database schema for Phase 1 development:
+   ```bash
+   # Install EF Core tools if not already installed
+   dotnet tool install --global dotnet-ef
+   
+   # Create and seed the database
+   dotnet ef database update
+   ```
+   
+   For detailed database setup instructions, see [docs/database-setup-guide.md](docs/database-setup-guide.md)
+
+4. **Setup Frontend**
    ```bash
    cd ../fantasy-basketball-client
    npm install
@@ -119,11 +133,12 @@ The React app will start at `http://localhost:5173` (or similar port shown in te
 
 ### Backend Development
 
-The backend uses in-memory data storage with sample players. To add real data:
+The backend now supports SQL Server database persistence using Entity Framework Core. For detailed information:
 
-1. Modify `Services/PlayerService.cs` to connect to a database
-2. Implement data persistence
-3. Add external NBA API integration for live data
+- **Database Schema**: See [docs/database-schema.md](docs/database-schema.md) for complete schema documentation
+- **Setup Guide**: See [docs/database-setup-guide.md](docs/database-setup-guide.md) for step-by-step setup instructions
+
+The application currently uses in-memory data in `PlayerService.cs` for backward compatibility. Future development will migrate to use the database context for data persistence.
 
 ### Frontend Development
 
@@ -158,6 +173,10 @@ fantasy-basketball-manager/
 │   │   ├── PlayerService.cs
 │   │   ├── AnalysisService.cs
 │   │   └── NbaScheduleService.cs
+│   ├── Data/                       # Database context and migrations
+│   │   ├── FantasyBasketballContext.cs
+│   │   ├── DbInitializer.cs
+│   │   └── Migrations/             # EF Core migrations
 │   └── Program.cs                  # App configuration
 ├── fantasy-basketball-client/      # React Frontend
 │   ├── src/
@@ -169,6 +188,10 @@ fantasy-basketball-manager/
 │   │   ├── App.jsx                 # Main app component
 │   │   └── main.jsx                # Entry point
 │   └── package.json
+├── docs/                           # Documentation
+│   ├── plans.md                    # Development roadmap
+│   ├── database-schema.md          # Database schema documentation
+│   └── database-setup-guide.md     # Database setup instructions
 └── README.md
 ```
 
