@@ -64,6 +64,8 @@ cd FantasyBasketballApi
 
 ### Step 3: Update Connection String (if needed)
 
+**Important**: All subsequent commands should be run from the `FantasyBasketballApi` directory.
+
 Edit `appsettings.json` if you're not using LocalDB:
 
 **For SQL Server Express (default instance):**
@@ -184,10 +186,10 @@ If you prefer to use the SQL script directly:
 sqllocaldb info
 
 # Create new instance if needed
-sqllocaldb create "MSSQLLocalDB"
+sqllocaldb create "mssqllocaldb"
 
 # Start the instance
-sqllocaldb start "MSSQLLocalDB"
+sqllocaldb start "mssqllocaldb"
 ```
 
 ### Issue: dotnet-ef command not found

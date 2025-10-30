@@ -84,9 +84,9 @@ Located in `/fantasy-basketball-client`
    dotnet build
    ```
 
-3. **Setup Database** (Optional - currently using in-memory data)
+3. **Setup Database** (Optional for now - can use in-memory data)
    
-   The project includes SQL Server database schema for Phase 1 development:
+   The project includes SQL Server database schema for Phase 1 development. The application currently uses in-memory data by default but includes full database infrastructure:
    ```bash
    # Install EF Core tools if not already installed
    dotnet tool install --global dotnet-ef
