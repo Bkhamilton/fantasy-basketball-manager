@@ -18,15 +18,18 @@ public class SportsDbController : ControllerBase
     }
 
     /// <summary>
-    /// Sanitizes a string for safe logging by removing control characters
+    /// Sanitizes a string for safe logging by removing control characters and limiting length
     /// </summary>
-    private static string SanitizeForLogging(string input)
+    private static string SanitizeForLogging(string? input)
     {
         if (string.IsNullOrEmpty(input))
-            return input;
+            return string.Empty;
         
-        // Remove newlines and other control characters that could be used for log injection
-        return string.Concat(input.Where(c => !char.IsControl(c) || c == ' '));
+        // Remove newlines, carriage returns, and other control characters that could be used for log injection
+        var sanitized = new string(input.Where(c => !char.IsControl(c) && c < 127).ToArray());
+        
+        // Limit length to prevent log flooding
+        return sanitized.Length > 200 ? sanitized.Substring(0, 200) : sanitized;
     }
 
     /// <summary>
