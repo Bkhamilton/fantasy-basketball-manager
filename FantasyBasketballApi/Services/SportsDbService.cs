@@ -161,15 +161,21 @@ public class SportsDbService : ISportsDbService
 
                 totalPlayers += sportsDbPlayers.Count;
 
+                // Get team abbreviation
+                var teamAbbr = TeamAbbreviations.GetValueOrDefault(teamName, teamName.Replace("_", ""));
+
+                // Load all existing players for this team upfront to avoid N+1 queries
+                var existingPlayers = await _context.Players
+                    .Where(p => p.Team == teamAbbr)
+                    .Select(p => p.Name)
+                    .ToListAsync();
+                
+                var existingPlayerNames = new HashSet<string>(existingPlayers, StringComparer.OrdinalIgnoreCase);
+
                 foreach (var sportsDbPlayer in sportsDbPlayers)
                 {
-                    // Check if player already exists (by name and team)
-                    var existingPlayer = await _context.Players
-                        .FirstOrDefaultAsync(p => 
-                            p.Name == sportsDbPlayer.StrPlayer && 
-                            p.Team == TeamAbbreviations[teamName]);
-
-                    if (existingPlayer != null)
+                    // Check if player already exists using the in-memory set
+                    if (existingPlayerNames.Contains(sportsDbPlayer.StrPlayer ?? ""))
                     {
                         _logger.LogInformation("Player {PlayerName} already exists, skipping", sportsDbPlayer.StrPlayer);
                         continue;
@@ -179,7 +185,7 @@ public class SportsDbService : ISportsDbService
                     var player = new Player
                     {
                         Name = sportsDbPlayer.StrPlayer ?? "Unknown",
-                        Team = TeamAbbreviations.GetValueOrDefault(teamName, teamName.Replace("_", "")),
+                        Team = teamAbbr,
                         Position = MapPosition(sportsDbPlayer.StrPosition),
                         IsStarting = false,
                         Stats = new PlayerStats
@@ -209,9 +215,6 @@ public class SportsDbService : ISportsDbService
                         player.Name, player.Team, player.Position);
                 }
 
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Saved players for team: {TeamName}", teamName);
-
                 // Add a small delay to avoid overwhelming the API
                 await Task.Delay(250);
             }
@@ -222,8 +225,18 @@ public class SportsDbService : ISportsDbService
             }
         }
 
-        _logger.LogInformation("Completed fetching players. Total fetched: {TotalPlayers}, Inserted: {InsertedCount}", 
-            totalPlayers, insertedPlayers.Count);
+        // Save all changes at once after processing all teams
+        try
+        {
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Completed fetching players. Total fetched: {TotalPlayers}, Inserted: {InsertedCount}", 
+                totalPlayers, insertedPlayers.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error saving players to database");
+            throw;
+        }
 
         return insertedPlayers;
     }
