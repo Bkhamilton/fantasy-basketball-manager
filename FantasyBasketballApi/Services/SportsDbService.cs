@@ -111,7 +111,7 @@ public class SportsDbService : ISportsDbService
         }
 
         var url = $"https://www.thesportsdb.com/api/v1/json/{apiKey}/searchplayers.php?t={teamName}";
-        _logger.LogInformation("Fetching players for team: {TeamName} from URL: {Url}", teamName, url);
+        _logger.LogInformation("Fetching players for team: {TeamName}", teamName);
 
         var client = _httpClientFactory.CreateClient();
         
@@ -162,7 +162,11 @@ public class SportsDbService : ISportsDbService
                 totalPlayers += sportsDbPlayers.Count;
 
                 // Get team abbreviation
-                var teamAbbr = TeamAbbreviations.GetValueOrDefault(teamName, teamName.Replace("_", ""));
+                if (!TeamAbbreviations.TryGetValue(teamName, out var teamAbbr))
+                {
+                    _logger.LogWarning("Team {TeamName} not found in abbreviation mapping, using fallback", teamName);
+                    teamAbbr = teamName.Replace("_", "").Substring(0, Math.Min(3, teamName.Replace("_", "").Length)).ToUpper();
+                }
 
                 // Load all existing players for this team upfront to avoid N+1 queries
                 var existingPlayers = await _context.Players

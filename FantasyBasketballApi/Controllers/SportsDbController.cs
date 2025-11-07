@@ -66,6 +66,25 @@ public class SportsDbController : ControllerBase
     [HttpGet("fetch-players/{teamName}")]
     public async Task<ActionResult<List<SportsDbPlayer>>> FetchPlayersForTeam(string teamName)
     {
+        // Validate team name format
+        if (string.IsNullOrWhiteSpace(teamName))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Team name is required"
+            });
+        }
+
+        if (!teamName.Contains('_'))
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Team name must be in format City_TeamName (e.g., Los_Angeles_Lakers, Boston_Celtics)"
+            });
+        }
+
         try
         {
             _logger.LogInformation("Fetching players for team: {TeamName}", teamName);
