@@ -2,6 +2,7 @@ using System.Net.Http;
 using System.Text.Json;
 using FantasyBasketballApi.Models;
 using FantasyBasketballApi.Data;
+using FantasyBasketballApi.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace FantasyBasketballApi.Services;
@@ -101,21 +102,6 @@ public class SportsDbService : ISportsDbService
         _logger = logger;
     }
 
-    /// <summary>
-    /// Sanitizes a string for safe logging by removing control characters and limiting length
-    /// </summary>
-    private static string SanitizeForLogging(string? input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return string.Empty;
-        
-        // Remove newlines, carriage returns, and other control characters that could be used for log injection
-        var sanitized = new string(input.Where(c => !char.IsControl(c) && c < 127).ToArray());
-        
-        // Limit length to prevent log flooding
-        return sanitized.Length > 200 ? sanitized.Substring(0, 200) : sanitized;
-    }
-
     public async Task<List<SportsDbPlayer>> FetchPlayersForTeamAsync(string teamName)
     {
         var apiKey = _configuration["SPORTSDB_API_KEY"];
@@ -126,7 +112,7 @@ public class SportsDbService : ISportsDbService
         }
 
         var url = $"https://www.thesportsdb.com/api/v1/json/{apiKey}/searchplayers.php?t={teamName}";
-        _logger.LogInformation("Fetching players for team: {TeamName}", SanitizeForLogging(teamName));
+        _logger.LogInformation("Fetching players for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
 
         var client = _httpClientFactory.CreateClient();
         
@@ -145,12 +131,12 @@ public class SportsDbService : ISportsDbService
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "HTTP error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
+            _logger.LogError(ex, "HTTP error while fetching players for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
             throw;
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "JSON deserialization error for team: {TeamName}", SanitizeForLogging(teamName));
+            _logger.LogError(ex, "JSON deserialization error for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
             throw;
         }
     }
@@ -180,7 +166,8 @@ public class SportsDbService : ISportsDbService
                 if (!TeamAbbreviations.TryGetValue(teamName, out var teamAbbr))
                 {
                     _logger.LogWarning("Team {TeamName} not found in abbreviation mapping, using fallback", teamName);
-                    teamAbbr = teamName.Replace("_", "").Substring(0, Math.Min(3, teamName.Replace("_", "").Length)).ToUpper();
+                    var nameWithoutUnderscore = teamName.Replace("_", "");
+                    teamAbbr = nameWithoutUnderscore.Substring(0, Math.Min(3, nameWithoutUnderscore.Length)).ToUpper();
                 }
 
                 // Load all existing players for this team upfront to avoid N+1 queries

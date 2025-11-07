@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FantasyBasketballApi.Services;
 using FantasyBasketballApi.Models;
+using FantasyBasketballApi.Utilities;
 
 namespace FantasyBasketballApi.Controllers;
 
@@ -15,21 +16,6 @@ public class SportsDbController : ControllerBase
     {
         _sportsDbService = sportsDbService;
         _logger = logger;
-    }
-
-    /// <summary>
-    /// Sanitizes a string for safe logging by removing control characters and limiting length
-    /// </summary>
-    private static string SanitizeForLogging(string? input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return string.Empty;
-        
-        // Remove newlines, carriage returns, and other control characters that could be used for log injection
-        var sanitized = new string(input.Where(c => !char.IsControl(c) && c < 127).ToArray());
-        
-        // Limit length to prevent log flooding
-        return sanitized.Length > 200 ? sanitized.Substring(0, 200) : sanitized;
     }
 
     /// <summary>
@@ -102,7 +88,7 @@ public class SportsDbController : ControllerBase
 
         try
         {
-            _logger.LogInformation("Fetching players for team: {TeamName}", SanitizeForLogging(teamName));
+            _logger.LogInformation("Fetching players for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
             var players = await _sportsDbService.FetchPlayersForTeamAsync(teamName);
             
             return Ok(new
@@ -115,7 +101,7 @@ public class SportsDbController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "Configuration error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
+            _logger.LogError(ex, "Configuration error while fetching players for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
             return BadRequest(new
             {
                 success = false,
@@ -124,7 +110,7 @@ public class SportsDbController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
+            _logger.LogError(ex, "Error while fetching players for team: {TeamName}", LoggingUtilities.SanitizeForLogging(teamName));
             return StatusCode(500, new
             {
                 success = false,
