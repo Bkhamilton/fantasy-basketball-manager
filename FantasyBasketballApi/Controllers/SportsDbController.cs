@@ -18,6 +18,18 @@ public class SportsDbController : ControllerBase
     }
 
     /// <summary>
+    /// Sanitizes a string for safe logging by removing control characters
+    /// </summary>
+    private static string SanitizeForLogging(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+        
+        // Remove newlines and other control characters that could be used for log injection
+        return string.Concat(input.Where(c => !char.IsControl(c) || c == ' '));
+    }
+
+    /// <summary>
     /// Fetches all NBA players from SportsDB API and inserts them into the database
     /// </summary>
     /// <returns>List of inserted players</returns>
@@ -87,7 +99,7 @@ public class SportsDbController : ControllerBase
 
         try
         {
-            _logger.LogInformation("Fetching players for team: {TeamName}", teamName);
+            _logger.LogInformation("Fetching players for team: {TeamName}", SanitizeForLogging(teamName));
             var players = await _sportsDbService.FetchPlayersForTeamAsync(teamName);
             
             return Ok(new
@@ -100,7 +112,7 @@ public class SportsDbController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "Configuration error while fetching players for team: {TeamName}", teamName);
+            _logger.LogError(ex, "Configuration error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
             return BadRequest(new
             {
                 success = false,
@@ -109,7 +121,7 @@ public class SportsDbController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while fetching players for team: {TeamName}", teamName);
+            _logger.LogError(ex, "Error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
             return StatusCode(500, new
             {
                 success = false,

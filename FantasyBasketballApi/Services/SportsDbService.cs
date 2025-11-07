@@ -101,6 +101,18 @@ public class SportsDbService : ISportsDbService
         _logger = logger;
     }
 
+    /// <summary>
+    /// Sanitizes a string for safe logging by removing control characters
+    /// </summary>
+    private static string SanitizeForLogging(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+        
+        // Remove newlines and other control characters that could be used for log injection
+        return string.Concat(input.Where(c => !char.IsControl(c) || c == ' '));
+    }
+
     public async Task<List<SportsDbPlayer>> FetchPlayersForTeamAsync(string teamName)
     {
         var apiKey = _configuration["SPORTSDB_API_KEY"];
@@ -111,7 +123,7 @@ public class SportsDbService : ISportsDbService
         }
 
         var url = $"https://www.thesportsdb.com/api/v1/json/{apiKey}/searchplayers.php?t={teamName}";
-        _logger.LogInformation("Fetching players for team: {TeamName}", teamName);
+        _logger.LogInformation("Fetching players for team: {TeamName}", SanitizeForLogging(teamName));
 
         var client = _httpClientFactory.CreateClient();
         
@@ -130,12 +142,12 @@ public class SportsDbService : ISportsDbService
         }
         catch (HttpRequestException ex)
         {
-            _logger.LogError(ex, "HTTP error while fetching players for team: {TeamName}", teamName);
+            _logger.LogError(ex, "HTTP error while fetching players for team: {TeamName}", SanitizeForLogging(teamName));
             throw;
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "JSON deserialization error for team: {TeamName}", teamName);
+            _logger.LogError(ex, "JSON deserialization error for team: {TeamName}", SanitizeForLogging(teamName));
             throw;
         }
     }
