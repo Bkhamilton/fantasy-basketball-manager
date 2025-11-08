@@ -17,6 +17,10 @@ builder.Services.AddDbContext<FantasyBasketballContext>(options =>
 builder.Services.AddSingleton<IPlayerService, PlayerService>();
 builder.Services.AddSingleton<IAnalysisService, AnalysisService>();
 builder.Services.AddSingleton<INbaScheduleService, NbaScheduleService>();
+builder.Services.AddScoped<ISportsDbService, SportsDbService>();
+
+// Register HttpClient for external API calls
+builder.Services.AddHttpClient();
 
 // Add CORS
 builder.Services.AddCors(options =>

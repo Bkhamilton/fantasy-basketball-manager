@@ -37,12 +37,15 @@ Located in `/FantasyBasketballApi`
 - `GET /api/roster` - Get current roster (starting + bench)
 - `GET /api/analysis/start-sit-recommendations` - Get AI recommendations
 - `GET /api/schedule/today` - Get today's NBA schedule
+- `POST /api/sportsdb/fetch-and-insert-players` - Fetch all NBA players from SportsDB and insert into database
+- `GET /api/sportsdb/fetch-players/{teamName}` - Fetch players for a specific team from SportsDB
 
 **Technology Stack:**
 - ASP.NET Core Web API
 - Dependency Injection
 - RESTful API design
 - CORS enabled for React frontend
+- SportsDB API integration for player data
 
 ### Frontend (React + Vite)
 
@@ -97,7 +100,22 @@ Located in `/fantasy-basketball-client`
    
    For detailed database setup instructions, see [docs/database-setup-guide.md](docs/database-setup-guide.md)
 
-4. **Setup Frontend**
+4. **Configure SportsDB API (Optional - for importing real NBA player data)**
+   
+   To fetch real NBA player data from TheSportsDB:
+   - Get a free API key from [TheSportsDB.com](https://www.thesportsdb.com/)
+   - Set the environment variable:
+     ```bash
+     # Windows PowerShell
+     $env:SPORTSDB_API_KEY="your_api_key_here"
+     
+     # Linux/macOS
+     export SPORTSDB_API_KEY=your_api_key_here
+     ```
+   
+   For detailed SportsDB integration instructions, see [docs/sportsdb-integration.md](docs/sportsdb-integration.md)
+
+5. **Setup Frontend**
    ```bash
    cd ../fantasy-basketball-client
    npm install
@@ -191,7 +209,8 @@ fantasy-basketball-manager/
 ├── docs/                           # Documentation
 │   ├── plans.md                    # Development roadmap
 │   ├── database-schema.md          # Database schema documentation
-│   └── database-setup-guide.md     # Database setup instructions
+│   ├── database-setup-guide.md     # Database setup instructions
+│   └── sportsdb-integration.md     # SportsDB API integration guide
 └── README.md
 ```
 
